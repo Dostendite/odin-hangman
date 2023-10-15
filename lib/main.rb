@@ -2,10 +2,6 @@
 
 # Main game file
 
-# When a new game is started, your script should load in the
-# dictionary and randomly select a word between 5 and 12
-# characters long for the secret word.
-
 # Main game class w/ main menu
 class Game
   def initialize
@@ -35,11 +31,11 @@ class Game
   def pick_secret_word
     words_file = File.open('words.txt')
     word_list = words_file.readlines.map(&:chomp)
-  
+
     word_list.each do |word|
       word_list.delete(word) if word.length < 5 || word.length > 12
     end
-  
+
     secret_word = word_list.sample
     puts "The secret word is #{secret_word}"
   end
@@ -59,7 +55,7 @@ class Ragdoll
   end
 
   def print_ragdoll
-    # putss the ragdoll based on the lives left
+    
   end
 
   # Every time the player fails a guess,
