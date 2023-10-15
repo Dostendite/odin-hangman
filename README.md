@@ -1,1 +1,3 @@
-# odin-hangman
+# Odin Hangman
+
+Ruby hangman game - WIP
