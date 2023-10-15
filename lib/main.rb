@@ -1,5 +1,8 @@
 # frozen_string_literal: true
 
+require_relative 'save_game'
+require_relative 'ragdoll_print'
+require_relative 'ragdoll'
 # Main game file
 
 # Main game class w/ main menu
@@ -46,27 +49,5 @@ class Game
   end
 end
 
-# Ragdoll class for hangman
-class Ragdoll
-  attr_reader :lives
-
-  def initialize
-    @lives = 10
-  end
-
-  def print_ragdoll
-    
-  end
-
-  # Every time the player fails a guess,
-  # the game object will inform this class
-  # and run the lose_life method
-  def lose_life
-    @lives -= 1
-    print_ragdoll
-  end
-end
-
 # Saving / loading the game
 module SaveGame; end
-

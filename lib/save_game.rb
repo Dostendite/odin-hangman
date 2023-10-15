@@ -1,4 +1,8 @@
 # frozen_string_literal: true
 
-# Placeholder file for SaveGame module
-
+# Module allows for file saving & loading
+module SaveGame
+  def access_saves; end
+  def save_game; end
+  def load_game; end
+end
