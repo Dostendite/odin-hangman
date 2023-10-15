@@ -9,7 +9,7 @@
 # Main game class w/ main menu
 class Game
   def initialize
-    @secret_word = ''
+    @secret_word = pick_secret_word
     @letters_guessed = []
     @letters_tried = []
     @ragdoll = Ragdoll.new
@@ -26,11 +26,23 @@ class Game
     # Get user input
 
     # Interact with the ragdoll class
-    # only when the player fails, and print it
+    # only when the player fails, and puts it
     # all the time
   end
 
   private
+
+  def pick_secret_word
+    words_file = File.open('words.txt')
+    word_list = words_file.readlines.map(&:chomp)
+  
+    word_list.each do |word|
+      word_list.delete(word) if word.length < 5 || word.length > 12
+    end
+  
+    secret_word = word_list.sample
+    puts "The secret word is #{secret_word}"
+  end
 
   def make_guess
     # If the guess is correct, run update_guess
@@ -47,7 +59,7 @@ class Ragdoll
   end
 
   def print_ragdoll
-    # Prints the ragdoll based on the lives left
+    # putss the ragdoll based on the lives left
   end
 
   # Every time the player fails a guess,
@@ -61,3 +73,4 @@ end
 
 # Saving / loading the game
 module SaveGame; end
+
