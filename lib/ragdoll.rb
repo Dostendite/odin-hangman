@@ -18,13 +18,3 @@ class Ragdoll
   end
 end
 
-ragdoll = Ragdoll.new
-
-ragdoll.print_ragdoll(10)
-
-puts "Building ragdoll..."
-
-10.times do
-  ragdoll.lose_life
-  sleep 0.5
-end
