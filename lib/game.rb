@@ -10,6 +10,7 @@ class Game
     @right_guesses = []
     @wrong_guesses = []
     @ragdoll = Ragdoll.new
+    # @save_id = create_save
   end
 
   def start_game
@@ -19,15 +20,40 @@ class Game
   end
 
   def play_game
-    loop do
+    game_status = game_over_check
+
+    while game_status == 'continue'
       print_game
       make_guess
 
-      check_game_over
+      game_status = game_over_check
     end
+
+    end_game(game_status)
   end
 
   private
+
+  def end_game(game_status)
+    if game_status == 'victory'
+      print_game
+      puts 'You win!'
+    else
+      print_game
+      puts 'You lose!'
+    end
+
+    # delete_save
+  end
+
+  def game_over_check
+    if @secret_word.chars.all? { |letter| @right_guesses.include?(letter) }
+      return 'victory'
+    elsif @ragdoll.lives_left < 1
+      return 'defeat'
+    end
+    return 'continue'
+  end
 
   def print_main_menu
     puts '         HANGMAN GAME         '
@@ -39,9 +65,10 @@ class Game
 
   def print_game
     system 'clear'
-    @ragdoll.print_ragdoll
+    @ragdoll.print_ragdoll(@ragdoll.lives_left)
     print_secret_word
-    puts "Letters already guessed: #{@right_guesses}" if @right_guesses.length > 0
+
+    print_guesses_made
   end
 
   def print_secret_word
@@ -55,7 +82,8 @@ class Game
       end
       secret_word_print.push(' ')
     end
-    puts secret_word_print.join
+    print 'Secret word: '
+    print "#{secret_word_print.join} "
   end
 
   def make_guess
@@ -67,7 +95,7 @@ class Game
     else
       puts 'You guessed wrong!'
       @wrong_guesses.push(letter_guess)
-      ragdoll.lose_life
+      @ragdoll.lose_life
     end
   end
 
@@ -87,7 +115,7 @@ class Game
       choice = gets.chomp
 
       if choice == '1'
-        create_save
+        play_game
         break
       elsif choice == '2'
         load_save
@@ -99,7 +127,7 @@ class Game
   end
 
   def fetch_letter_guess
-    print 'Enter letter to guess: '
+    print 'Enter guess: '
     letter_guess = ''
 
     loop do
@@ -116,18 +144,22 @@ class Game
         print 'Please enter a letter [a-z]: '
       end
     end
-
     letter_guess.downcase
   end
 
-  # dummy functions
-  def create_save
-    puts 'Creating save..'
+  def print_guesses_made
+    guesses_made = (@right_guesses + @wrong_guesses).sort
+    puts "Guesses made: #{guesses_made.join(', ')}"
   end
 
-  def load_save
-    puts 'Loading save...'
-  end
+  # dummy functions for save_game module
+  def scan_saves; end
+
+  def create_save; end
+
+  def load_save; end
+
+  def delete_save; end
 end
 
 Game.new.start_game

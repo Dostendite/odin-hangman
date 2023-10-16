@@ -5,7 +5,7 @@ require_relative 'ragdoll_print'
 # Hangman ragdoll
 class Ragdoll
   include RagdollPrint
-  attr_reader :lives
+  attr_reader :lives_left
 
   def initialize
     @lives_left = 10
@@ -16,4 +16,3 @@ class Ragdoll
     @lives_left -= 1
   end
 end
-
