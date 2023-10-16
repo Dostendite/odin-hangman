@@ -14,7 +14,6 @@ class Ragdoll
   # this method will be run by the game object
   def lose_life
     @lives_left -= 1
-    print_ragdoll(@lives_left)
   end
 end
 

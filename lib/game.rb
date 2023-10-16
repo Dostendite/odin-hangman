@@ -11,7 +11,6 @@ class Game
     @wrong_guesses = []
     @ragdoll = Ragdoll.new
   end
-  # Word input is case insensitive
 
   def start_game
     system 'clear'
@@ -20,18 +19,20 @@ class Game
   end
 
   def play_game
-    # Get user input
+    loop do
+      print_game
+      make_guess
 
-    # Remember that the ragdoll print method
-    # will print the amount of lives left
+      check_game_over
+    end
   end
 
   private
 
   def print_main_menu
-    puts "\n|------- HANGMAN GAME -------|"
-    puts '|------- 1. New  game  ------|'
-    puts '|------- 2. Load game -------|'
+    puts '         HANGMAN GAME         '
+    puts '       [ 1. New  game ]       '
+    puts '       [ 2. Load game ]       '
     puts
     print 'New game [1] | Load game [2]: '
   end
@@ -41,7 +42,7 @@ class Game
     system 'clear'
     @ragdoll.print_ragdoll
     print_secret_word
-    # -> the letters already guessed (after the word)
+    puts "Letters already guessed: #{@right_guesses}" if @right_guesses.length > 0
   end
 
   def print_secret_word
@@ -51,11 +52,16 @@ class Game
   end
 
   def make_guess
-    fetch_letter_guess
-    # puts "Letters already guessed: #{letters_guessed}"
+    letter_guess = fetch_letter_guess
 
-    # if the guess is correct, run update_guess
-    # else, @ragdoll.lose_life
+    if @secret_word.include?(letter_guess)
+      puts 'You guessed right!'
+      @right_guesses.push(letter_guess)
+    else
+      puts 'You guessed wrong!'
+      @wrong_guesses.push(letter_guess)
+      ragdoll.lose_life
+    end
   end
 
   def pick_secret_word
@@ -87,15 +93,14 @@ class Game
 
   def fetch_letter_guess
     print 'Enter letter to guess: '
-
-    letter_choice = ''
+    letter_guess = ''
 
     loop do
-      letter_choice = gets.chomp
+      letter_guess = gets.chomp.downcase
 
-      if ('a'..'z').include?(letter_choice.downcase)
-        if @right_guesses.include?(letter_choice.downcase) ||
-           @wrong_guesses.include?(letter_choice.downcase)
+      if ('a'..'z').include?(letter_guess)
+        if @right_guesses.include?(letter_guess) ||
+           @wrong_guesses.include?(letter_guess)
           print 'Letter already attempted, pick another one: '
         else
           break
@@ -105,7 +110,7 @@ class Game
       end
     end
 
-    letter_choice.downcase
+    letter_guess.downcase
   end
 
   # dummy functions
