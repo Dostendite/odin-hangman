@@ -171,7 +171,6 @@ module RagdollPrint
   ]
 
   def print_ragdoll(lives_left)
-    system 'clear'
     @@ragdoll_strings[10 - lives_left].each { |line| puts line }
   end
 end

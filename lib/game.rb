@@ -7,8 +7,8 @@ require_relative 'ragdoll'
 class Game
   def initialize
     @secret_word = pick_secret_word
-    @letters_guessed = []
-    @letters_tried = []
+    @right_guesses = []
+    @wrong_guesses = []
     @ragdoll = Ragdoll.new
   end
   # Word input is case insensitive
@@ -22,12 +22,41 @@ class Game
   def play_game
     # Get user input
 
-    # Interact with the ragdoll class
-    # only when the player fails, and puts it
-    # all the time
+    # Remember that the ragdoll print method
+    # will print the amount of lives left
   end
 
-  private
+  # private
+
+  # print out all the game elements
+  def print_game
+    system 'clear'
+    @ragdoll.print_ragdoll
+    print_secret_word
+    # -> the letters already guessed (after the word)
+  end
+
+  def print_secret_word
+    # prints the secret word but
+    # replacing letters not yet
+    # discovered with an underscore
+  end
+
+  def make_guess
+    # puts "Letters already guessed: #{letters_guessed}"
+    puts 'Enter letter to guess: '
+
+    loop do
+      guess = gets.chomp
+
+      break if ('a'..'z').include?(guess.downcase)
+
+      puts 'Please enter a valid letter (a-z): '
+    end
+
+    # if the guess is correct, run update_guess
+    # else, @ragdoll.lose_life
+  end
 
   def pick_secret_word
     words_file = File.open('words.txt')
@@ -40,11 +69,6 @@ class Game
     secret_word = word_list.sample
     puts "The secret word is #{secret_word}"
   end
-
-  def make_guess
-    puts "Letters already guessed: #{letters_guessed}"
-    puts "Enter letter to guess: "
-    # If the guess is correct, run update_guess
-    # else, @ragdoll.lose_life
-  end
 end
+
+Game.new.make_guess
