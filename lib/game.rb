@@ -86,16 +86,26 @@ class Game
   end
 
   def fetch_letter_guess
-    puts 'Enter letter to guess: '
+    print 'Enter letter to guess: '
+
+    letter_choice = ''
 
     loop do
-      guess = gets.chomp
+      letter_choice = gets.chomp
 
-      # also account for characters that have already been tried
-      break if ('a'..'z').include?(guess.downcase)
-
-      puts 'Please enter a valid letter (a-z): '
+      if ('a'..'z').include?(letter_choice.downcase)
+        if @right_guesses.include?(letter_choice.downcase) ||
+           @wrong_guesses.include?(letter_choice.downcase)
+          print 'Letter already attempted, pick another one: '
+        else
+          break
+        end
+      else
+        print 'Please enter a letter [a-z]: '
+      end
     end
+
+    letter_choice.downcase
   end
 
   # dummy functions
