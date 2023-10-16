@@ -37,7 +37,6 @@ class Game
     print 'New game [1] | Load game [2]: '
   end
 
-  # print out all the game elements
   def print_game
     system 'clear'
     @ragdoll.print_ragdoll
@@ -46,9 +45,17 @@ class Game
   end
 
   def print_secret_word
-    # iterate through the letters in the word
-    # if they are in @right_guesses, show them
-    # else,
+    secret_word_print = []
+
+    @secret_word.each_char do |letter|
+      if @right_guesses.include?(letter)
+        secret_word_print.push(letter)
+      else
+        secret_word_print.push('_')
+      end
+      secret_word_print.push(' ')
+    end
+    puts secret_word_print.join
   end
 
   def make_guess
