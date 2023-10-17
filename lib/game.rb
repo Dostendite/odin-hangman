@@ -1,22 +1,24 @@
 # frozen_string_literal: true
 
+require_relative 'save_game'
 require_relative 'ragdoll_print'
 require_relative 'ragdoll'
 
 # Main game class w/ main menu
 class Game
+  include SaveGame
+
   def initialize
     @secret_word = pick_secret_word
     @right_guesses = []
     @wrong_guesses = []
     @ragdoll = Ragdoll.new
-    # @save_id = create_save
+    @save_id = nil
   end
 
   def start_game
-    system 'clear'
     print_main_menu
-    fetch_menu_choice
+    prompt_menu_choice
   end
 
   def play_game
@@ -34,15 +36,18 @@ class Game
 
   private
 
+  def prompt_menu_choice
+    choice = super
+    play_game
+  end
+
   def end_game(game_status)
+    print_game
     if game_status == 'victory'
-      print_game
       puts 'You win!'
     else
-      print_game
-      puts 'You lose!'
+      puts "You lose! The secret word was \"#{@secret_word}\""
     end
-
     # delete_save
   end
 
@@ -52,15 +57,8 @@ class Game
     elsif @ragdoll.lives_left < 1
       return 'defeat'
     end
-    return 'continue'
-  end
 
-  def print_main_menu
-    puts '         HANGMAN GAME         '
-    puts '       [ 1. New  game ]       '
-    puts '       [ 2. Load game ]       '
-    puts
-    print 'New game [1] | Load game [2]: '
+    return 'continue'
   end
 
   def print_game
@@ -82,12 +80,18 @@ class Game
       end
       secret_word_print.push(' ')
     end
-    print 'Secret word: '
-    print "#{secret_word_print.join} "
+    print "Secret word: #{secret_word_print.join}\n"
   end
 
   def make_guess
-    letter_guess = fetch_letter_guess
+    letter_guess = prompt_letter_guess
+
+    if letter_guess == 'save_game'
+      create_save
+      letter_guess = prompt_letter_guess
+    elsif letter_guess == 'load_game'
+      load_save
+    end
 
     if @secret_word.include?(letter_guess)
       puts 'You guessed right!'
@@ -110,41 +114,28 @@ class Game
     @secret_word = word_list.sample
   end
 
-  def fetch_menu_choice
-    loop do
-      choice = gets.chomp
-
-      if choice == '1'
-        play_game
-        break
-      elsif choice == '2'
-        load_save
-        break
-      else
-        print 'Please enter 1 or 2: '
-      end
-    end
-  end
-
-  def fetch_letter_guess
+  def prompt_letter_guess
     print 'Enter guess: '
-    letter_guess = ''
+
+    letter_guess = gets.chomp.downcase
+    return 'save_game' if letter_guess == 'save_game'
+    return 'load_game' if letter_guess == 'load_game'
 
     loop do
-      letter_guess = gets.chomp.downcase
-
       if ('a'..'z').include?(letter_guess)
         if @right_guesses.include?(letter_guess) ||
            @wrong_guesses.include?(letter_guess)
           print 'Letter already attempted, pick another one: '
+          letter_guess = gets.chomp.downcase
         else
           break
         end
       else
         print 'Please enter a letter [a-z]: '
+        letter_guess = gets.chomp.downcase
       end
     end
-    letter_guess.downcase
+    letter_guess[0].downcase
   end
 
   def print_guesses_made
@@ -152,14 +143,24 @@ class Game
     puts "Guesses made: #{guesses_made.join(', ')}"
   end
 
-  # dummy functions for save_game module
-  def scan_saves; end
+  def create_save
+    super(pack_data)
+    puts 'Saved the game!'
+  end
 
-  def create_save; end
+  def print_instance_variables
+    instance_variables.each do |var|
+      value = instance_variable_get var
+      puts "Instance variable #{var} | Value #{value}"
+    end
+  end
 
-  def load_save; end
-
-  def delete_save; end
+  def load_save
+    create_save
+    unpacked_save = super
+    unpacked_save.each do |key, val|
+      instance_variable_set("@#{key}", val)
+    end
+    play_game
+  end
 end
-
-Game.new.start_game
