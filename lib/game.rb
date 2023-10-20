@@ -3,6 +3,7 @@
 require_relative 'save_game'
 require_relative 'ragdoll_print'
 require_relative 'ragdoll'
+require 'pry-byebug'
 
 # Main game class w/ main menu
 class Game
@@ -13,7 +14,7 @@ class Game
     @right_guesses = []
     @wrong_guesses = []
     @ragdoll = Ragdoll.new
-    @save_id = nil
+    @current_save_id = generate_save_id
   end
 
   def start_game
@@ -37,18 +38,18 @@ class Game
   private
 
   def prompt_menu_choice
-    choice = super
+    super
     play_game
   end
 
   def end_game(game_status)
     print_game
+    delete_save(@current_save_id)
     if game_status == 'victory'
       puts 'You win!'
     else
       puts "You lose! The secret word was \"#{@secret_word}\""
     end
-    # delete_save
   end
 
   def game_over_check
@@ -57,8 +58,7 @@ class Game
     elsif @ragdoll.lives_left < 1
       return 'defeat'
     end
-
-    return 'continue'
+    'continue'
   end
 
   def print_game
@@ -87,10 +87,9 @@ class Game
     letter_guess = prompt_letter_guess
 
     if letter_guess == 'save_game'
+      delete_save(@current_save_id)
       create_save
       letter_guess = prompt_letter_guess
-    elsif letter_guess == 'load_game'
-      load_save
     end
 
     if @secret_word.include?(letter_guess)
@@ -148,19 +147,18 @@ class Game
     puts 'Saved the game!'
   end
 
-  def print_instance_variables
-    instance_variables.each do |var|
-      value = instance_variable_get var
-      puts "Instance variable #{var} | Value #{value}"
-    end
-  end
-
   def load_save
-    create_save
     unpacked_save = super
     unpacked_save.each do |key, val|
       instance_variable_set("@#{key}", val)
     end
     play_game
+  end
+
+  def print_instance_variables
+    instance_variables.each do |var|
+      value = instance_variable_get var
+      puts "Instance variable #{var} | Value #{value}"
+    end
   end
 end

@@ -171,6 +171,8 @@ module RagdollPrint
   ]
 
   def print_ragdoll(lives_left)
+    return if lives_left < 1
+
     @@ragdoll_strings[10 - lives_left].each { |line| puts line }
   end
 end

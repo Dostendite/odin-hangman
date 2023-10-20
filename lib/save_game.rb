@@ -2,6 +2,7 @@
 
 require 'json'
 require_relative 'ragdoll'
+require 'pry-byebug'
 
 # Module allows for file saving & loading
 module SaveGame
@@ -10,10 +11,8 @@ module SaveGame
   def print_introduction
     system 'clear'
     puts 'Welcome to my Hangman game, I hope you will enjoy it!'
-    puts 'Remember that you can save the game at ANY point in time'
-    puts 'with the command \'save_game\', and you can load any game'
-    puts 'with \'load_game\'!'
-    puts
+    puts 'Remember that you can save the game at any point in time'
+    puts 'with the command \'save_game\'.'
     print 'Press any key to start the game... '
 
     gets
@@ -33,8 +32,8 @@ module SaveGame
     save_list = scan_saves
     system 'clear'
     puts '          SAVE MENU           '
-    save_list.each do |save|
-      puts "        [ Save No. #{save} ]      "
+    save_list.each_with_index do |save, idx|
+      puts "      [ #{idx + 1}. Save No. ##{save} ]"
     end
   end
 
@@ -56,24 +55,40 @@ module SaveGame
   end
 
   def create_save(save_object)
-    save_list = scan_saves
-    new_save_name = "hangman_save_#{save_list.size + 1}"
+    new_save_id = generate_save_id
+    new_save_name = "hangman_save_#{new_save_id}"
     new_save_file = File.open("#{SAVES_DIRECTORY}/#{new_save_name}", 'w+')
     new_save_file.write(save_object)
     new_save_file.close
+    new_save_name.match(/\d+/).to_s
   end
 
   def load_save
-    save_id = prompt_save_to_load
-
+    id_to_load = prompt_save_to_load
+    save_data = nil
     save_list = scan_saves('load')
-    save_to_load = File.open(save_list[save_id.to_i - 1], 'r')
-    save_data = save_to_load.read
-    Marshal.load(save_data)
+    save_list.each do |save|
+      save_id = save.match(/\d+/)
+      if id_to_load == save_id.to_s
+        save_to_load = File.open(save, 'r')
+        save_data = save_to_load.read
+        return Marshal.load(save_data)
+      end
+    end
   end
 
-  # def delete_save(save_id)
-  # end
+  def delete_save(id_to_delete)
+    save_list = scan_saves('load')
+    # binding.pry
+    save_list.each do |save|
+      save_id = save.match(/\d+/)
+      if save_id.to_s == id_to_delete.to_s
+        File.open(save, 'r') do |f|
+          File.delete(f)
+        end
+      end
+    end
+  end
 
   def pack_data
     save_object = {}
@@ -86,36 +101,44 @@ module SaveGame
     Marshal.dump(save_object)
   end
 
+  def generate_save_id
+    save_list = scan_saves
+    save_list.size + 1
+  end
+
   private
 
   def prompt_save_to_load
     print_saves_menu
+    save_list = scan_saves
 
     print 'Enter the ID of save to load: '
-
-    save_list = scan_saves('load')
-    id_to_load = gets.chomp.to_i
-
-    unless (1..save_list.size).include?(id_to_load)
-      until (1..save_list.size).include?(id_to_load)
-      print 'Please enter a valid save number: '
-      id_to_load = gets.chomp.to_i
+    id_to_load = gets.chomp
+    loop do
+      return id_to_load if save_list.include?(id_to_load)
+      until save_list.include?(id_to_load)
+        print 'Please enter a valid save number: '
+        id_to_load = gets.chomp
       end
     end
   end
 
   def prompt_menu_choice
+    save_list = scan_saves
+    choice = ''
     loop do
       choice = gets.chomp
       if choice == '1'
-        create_save
-        return choice
-      elsif choice == '2'
-        load_save
+        break
+      elsif choice == '2' && save_list.length.positive?
+        break
+      elsif choice == '2' && save_list.empty?
+        print 'No saves found! Please create a new game: '
       else
         print 'Please enter 1 or 2: '
       end
     end
+    choice == '1' ? create_save : load_save
   end
 end
 
