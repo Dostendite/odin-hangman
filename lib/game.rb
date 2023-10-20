@@ -3,7 +3,6 @@
 require_relative 'save_game'
 require_relative 'ragdoll_print'
 require_relative 'ragdoll'
-require 'pry-byebug'
 
 # Main game class w/ main menu
 class Game

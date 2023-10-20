@@ -2,7 +2,6 @@
 
 require 'json'
 require_relative 'ragdoll'
-require 'pry-byebug'
 
 # Module allows for file saving & loading
 module SaveGame
@@ -79,7 +78,6 @@ module SaveGame
 
   def delete_save(id_to_delete)
     save_list = scan_saves('load')
-    # binding.pry
     save_list.each do |save|
       save_id = save.match(/\d+/)
       if save_id.to_s == id_to_delete.to_s
