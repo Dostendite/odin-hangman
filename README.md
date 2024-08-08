@@ -1,4 +1,4 @@
-# Odin Hangman
+# Hangman for TOP
 
 ## Ruby hangman game
 
