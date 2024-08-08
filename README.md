@@ -1,6 +1,6 @@
-# Hangman for TOP
+## Ruby Hangman for TOP
 
-## Ruby hangman game
+🔰 [**Live preview**](https://replit.com/@skimgus12/odin-hangman)
 
 ```
      ____________               
